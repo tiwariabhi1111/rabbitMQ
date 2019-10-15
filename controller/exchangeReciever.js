@@ -1,7 +1,6 @@
 var amqp = require('amqplib/callback_api');
 
-
-exports.topicRecieve2 = (req, res) => {
+exports.exchangeReciever = (req, res) => {
     amqp.connect('amqp://localhost', function (error0, connection) {
         if (error0) {
             throw error0;
@@ -10,9 +9,9 @@ exports.topicRecieve2 = (req, res) => {
             if (error1) {
                 throw error1;
             }
-            var exchange = 'topic_logs';
+            var exchange = 'direct_logs';
 
-            channel.assertExchange(exchange, 'topic', {
+            channel.assertExchange(exchange, 'direct', {
                 durable: false
             });
 
@@ -22,13 +21,14 @@ exports.topicRecieve2 = (req, res) => {
                 if (error2) {
                     throw error2;
                 }
-                var key = "#.rabbit.*";
 
-                channel.bindQueue(q.queue, exchange, key);
+
+
+                channel.bindQueue(q.queue, exchange, "red");
 
 
                 channel.consume(q.queue, function (msg) {
-                    console.log(" [x] %s:'%s'", msg.fields.routingKey, msg.content.toString());
+                    console.log(" [x] %s: '%s'", msg.fields.routingKey, msg.content.toString());
                 }, {
                     noAck: true
                 });
